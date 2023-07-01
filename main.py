@@ -10,8 +10,16 @@ view = st.selectbox("Select data to view", ("Temperature", "Sky"))
 
 st.subheader(f"{view} for next {days} days in {station}")
 
-datas = get_data(station, days)
-
-
-figure = px.line(x=date, y=temperature, labels={'x': 'date', 'y': 'temperature'})
-st.plotly_chart(figure)
+if station:
+    datas = get_data(station, days)
+    if view == "Temperature":
+        dates = [date["dt_txt"] for date in datas]
+        temperature = [temper["main"]["temp"]/10 for temper in datas]
+        figure = px.line(x=dates, y=temperature, labels={'x': 'Dates', 'y': 'Temperature'})
+        st.plotly_chart(figure)
+    if view == "Sky":
+        file = {"Rain": "rain.png", "Clear": "clear.png", "Clouds": "cloud.png", "Snow": "snow.png"}
+        weather_icon = [icon["weather"][0]["main"] for icon in datas]
+        images_path = ["images/"+file[i] for i in weather_icon]
+        dates = [date["dt_txt"] for date in datas]
+        st.image(images_path, width=115, caption=dates)
